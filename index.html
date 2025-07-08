@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aarogyam</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.22/build/spline-viewer.js"></script>
 
   <style>
     html {
@@ -17,6 +18,7 @@
       overflow-x: hidden;
     }
 
+    /* Typing effect */
     .typing {
       overflow: hidden;
       white-space: nowrap;
@@ -36,6 +38,7 @@
       50% { border-color: transparent }
     }
 
+    /* Intro screen */
     #intro {
       position: fixed;
       inset: 0;
@@ -46,13 +49,113 @@
       align-items: center;
       flex-direction: column;
     }
+
+    /* Background 3D model */
+    #spline-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    #spline-bg.visible {
+      opacity: 1;
+    }
+
+    /* Main content */
+    #main-content {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    #main-content.visible {
+      opacity: 1;
+    }
   </style>
 </head>
-<body>
 
+<body class="bg-white text-[#003049]">
+
+  <spline-viewer id="spline-bg" url="https://prod.spline.design/ztNbSaAb3Tyngftd/scene.splinecode"></spline-viewer>
+
+  <!-- Animation -->
   <div id="intro">
     <h1 id="typed-title" class="typing">Aarogyam</h1>
   </div>
 
+  <!-- Main Content -->
+  <div id="main-content">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 w-full px-6 py-4 flex justify-between items-center z-20 bg-[#003049] text-white shadow-md">
+      <h1 class="text-2xl font-bold">Aarogyam</h1>
+      <a href="auth.html" class="bg-white text-[#003049] px-4 py-2 rounded hover:bg-[#e0e0e0] transition duration-300">
+        Login / Sign Up
+      </a>
+    </header>
+
+    <!-- center screen text-->
+    <section class="min-h-screen flex items-center justify-center text-center px-4">
+      <div class="max-w-2xl mt-20">
+        <h2 class="text-4xl font-bold mb-4">Your Health, Our Responsibility</h2>
+        <p class="text-lg mb-6 text-[#003049]">
+          Track your sleep, diet, exercise, and more with Aarogyam — your personalized health companion.
+        </p>
+        <a href="#features" class="bg-black text-white px-6 py-3 rounded-lg text-lg hover:bg-[#dfefff] transition duration-300">
+          Explore Features
+        </a>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20 bg-white text-[#003049] px-6">
+      <div class="max-w-5xl mx-auto text-center">
+        <h3 class="text-3xl font-bold mb-12">Features</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="bg-[#e0f7fa] p-6 rounded-lg shadow">
+            <h4 class="text-xl font-semibold mb-2">Daily Health Logging</h4>
+            <p class="text-sm">Track your sleep, meals, water, and exercise in one place.</p>
+          </div>
+          <div class="bg-[#e0f2f1] p-6 rounded-lg shadow">
+            <h4 class="text-xl font-semibold mb-2">Personalized Reports</h4>
+            <p class="text-sm">Weekly/monthly analysis with smart recommendations.</p>
+          </div>
+          <div class="bg-[#e3f2fd] p-6 rounded-lg shadow">
+            <h4 class="text-xl font-semibold mb-2">AI-Based Insights</h4>
+            <p class="text-sm">Get intelligent suggestions to improve your health.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-[#4dd0e1] to-[#81d4fa] text-[#003049] px-6">
+      <div class="text-center max-w-2xl mx-auto">
+        <h3 class="text-3xl font-bold mb-4">Start Your Health Journey Today</h3>
+        <p class="text-lg mb-6">Join Aarogyam and take the first step toward a healthier life.</p>
+        <a href="auth.html" class="bg-[#003049] text-white px-6 py-3 rounded-lg text-lg hover:bg-[#002538] transition duration-300">
+          Login / Sign Up
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#003049] text-center py-6 text-sm text-white">
+      © 2025 Aarogyam. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    setTimeout(() => {
+    
+      document.getElementById('intro').style.display = 'none';
+      document.getElementById('spline-bg').classList.add('visible');
+
+      document.getElementById('main-content').classList.add('visible');
+    }, 3000); 
+  </script>
 </body>
 </html>
