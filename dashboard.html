@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aarogyam | Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+    }
+  </style>
+</head>
+<body class="text-[#003049] min-h-screen px-6 py-8">
+  <!-- Header -->
+  <header class="flex flex-wrap justify-between items-center bg-white text-[#003049] shadow px-6 py-4 rounded-xl mb-6">
+    <h1 class="text-xl font-bold">Aarogyam</h1>
+    <nav class="space-x-4 text-sm font-medium">
+      <a href="index.html" class="hover:text-[#26c6da]">Home</a>
+      <a href="dashboard.html" class="text-[#26c6da] font-semibold">Dashboard</a>
+      <a href="#log" class="hover:text-[#26c6da]">Log Activity</a>
+      <a href="reports.html" class="hover:text-[#26c6da]">Reports</a>
+      <a href="contact.html" class="hover:text-[#26c6da]">Contact</a>
+      <a href="auth.html" class="hover:text-[#26c6da]">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Overview -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow p-4">
+      <h3 class="text-sm">Today’s Health Score</h3>
+      <p class="text-2xl font-bold">87/100</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4">
+      <h3 class="text-sm">Current Goal</h3>
+      <p id="goal-display" class="text-lg font-semibold">General Health</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4">
+      <h3 class="text-sm">Recommendation</h3>
+      <p class="text-sm">Stay hydrated & complete 7 hrs sleep</p>
+    </div>
+  </section>
+
+  <!-- Charts and progress -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white p-4 rounded-xl shadow" style="height: 300px;">
+      <h3 class="font-semibold mb-2">Sleep (Last 7 Days)</h3>
+      <canvas id="sleepChart" width="100%" height="300"></canvas>
+    </div>
+    <div class="bg-white p-4 rounded-xl shadow" style="height: 300px;">
+      <h3 class="font-semibold mb-2">Weight Progress</h3>
+      <canvas id="weightChart" width="100%" height="300"></canvas>
+    </div>
+  </section>
+
+  <!-- Daily Log Section -->
+  <section id="log" class="bg-white p-6 rounded-xl shadow max-w-3xl mx-auto">
+    <h3 class="text-xl font-bold mb-4">Log Today's Activity</h3>
+    <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="sleep" class="block text-sm mb-1">Sleep Hours</label>
+        <input type="number" id="sleep" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
+      </div>
+      <div>
+        <label for="water" class="block text-sm mb-1">Water Intake (L)</label>
+        <input type="number" step="0.1" id="water" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
+      </div>
+      <div>
+        <label for="exercise" class="block text-sm mb-1">Exercise (mins)</label>
+        <input type="number" id="exercise" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
+      </div>
+      <div>
+        <label for="meals" class="block text-sm mb-1">Meals</label>
+        <input type="text" id="meals" placeholder="e.g., oats, dal, rice" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
+      </div>
+
+      <!-- Diabetes management -->
+      <div id="diabetes-section" class="hidden col-span-2 grid grid-cols-2 gap-4">
+        <div>
+          <label for="sugarBefore" class="block text-sm mb-1">Blood Sugar (Before Meal)</label>
+          <input type="number" id="sugarBefore" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
+        </div>
+        <div>
+          <label for="sugarAfter" class="block text-sm mb-1">Blood Sugar (After Meal)</label>
+          <input type="number" id="sugarAfter" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
+        </div>
+      </div>
+
+      <!-- BP management -->
+      <div id="bp-section" class="hidden col-span-2 grid grid-cols-2 gap-4">
+        <div>
+          <label for="bpSystolic" class="block text-sm mb-1">Systolic (Upper)</label>
+          <input type="number" id="bpSystolic" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
+        </div>
+        <div>
+          <label for="bpDiastolic" class="block text-sm mb-1">Diastolic (Lower)</label>
+          <input type="number" id="bpDiastolic" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
+        </div>
+      </div>
+
+      <div class="col-span-2">
+        <button type="submit" class="w-full mt-2 bg-[#003049] text-white py-2 rounded hover:bg-[#002538]">
+          Save Log
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- consultation -->
+  <section class="bg-white p-6 rounded-xl shadow max-w-3xl mx-auto mt-10">
+    <h3 class="text-xl font-bold mb-4">Share Your Health Data with Doctor</h3>
+    <form class="grid gap-4">
+      <div>
+        <label for="doctorEmail" class="text-sm block mb-1">Doctor's Email</label>
+        <input type="email" id="doctorEmail" placeholder="doctor@example.com"
+               class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" required />
+      </div>
+
+      <div>
+        <label class="text-sm block mb-2">Select Data to Share</label>
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <label><input type="checkbox" class="mr-2" /> Sleep Data</label>
+          <label><input type="checkbox" class="mr-2" /> Water Intake</label>
+          <label><input type="checkbox" class="mr-2" /> Activity Logs</label>
+          <label><input type="checkbox" class="mr-2" /> Meals</label>
+          <label><input type="checkbox" class="mr-2" /> BP / Sugar Levels</label>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full mt-4 bg-[#003049] text-white py-2 rounded hover:bg-[#002538]">
+        Share with Doctor
+      </button>
+    </form>
+  </section>
+
+  <script>
+    const sleepCtx = document.getElementById('sleepChart').getContext('2d');
+    const weightCtx = document.getElementById('weightChart').getContext('2d');
+
+    new Chart(sleepCtx, {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Hours of Sleep',
+          data: [6.5, 7, 5.5, 8, 7.5, 6, 7],
+          backgroundColor: 'rgba(77, 208, 225, 0.2)',
+          borderColor: '#4dd0e1',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(weightCtx, {
+      type: 'line',
+      data: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        datasets: [{
+          label: 'Weight (kg)',
+          data: [72, 71.5, 70.8, 70],
+          backgroundColor: 'rgba(129, 212, 250, 0.2)',
+          borderColor: '#81d4fa',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    const goal = localStorage.getItem("userGoal") || "BP Management";
+    document.getElementById("goal-display").innerText = goal;
+
+    if (goal === "Diabetes Management") {
+      document.getElementById("diabetes-section").classList.remove("hidden");
+    }
+    if (goal === "BP Management") {
+      document.getElementById("bp-section").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
