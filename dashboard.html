@@ -26,7 +26,7 @@
     </nav>
   </header>
 
-  <!-- Overview Cards -->
+  <!-- Progress info -->
   <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
     <div class="bg-white rounded-xl shadow p-4">
       <h3 class="text-sm">Today’s Health Score</h3>
@@ -34,7 +34,16 @@
     </div>
     <div class="bg-white rounded-xl shadow p-4">
       <h3 class="text-sm">Current Goal</h3>
-      <p id="goal-display" class="text-lg font-semibold">General Health</p>
+      <div class="flex items-center justify-between">
+        <p id="goal-display" class="text-lg font-semibold">General Health</p>
+        <select id="change-goal" class="ml-4 px-3 py-1 bg-[#f0f9fa] rounded text-sm text-[#003049]">
+          <option>General Health</option>
+          <option>Weight Loss</option>
+          <option>Diabetes Management</option>
+          <option>Muscle Gain</option>
+          <option>BP Management</option>
+        </select>
+      </div>
     </div>
     <div class="bg-white rounded-xl shadow p-4">
       <h3 class="text-sm">Recommendation</h3>
@@ -58,7 +67,6 @@
   <section id="log" class="bg-white p-6 rounded-xl shadow max-w-3xl mx-auto">
     <h3 class="text-xl font-bold mb-4">Log Today's Activity</h3>
     <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- Common -->
       <div>
         <label for="sleep" class="block text-sm mb-1">Sleep Hours</label>
         <input type="number" id="sleep" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
@@ -76,7 +84,7 @@
         <input type="text" id="meals" placeholder="e.g., oats, dal, rice" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" />
       </div>
 
-      <!-- Diabetes management -->
+      <!-- Diabetes -->
       <div id="diabetes-section" class="hidden col-span-2 grid grid-cols-2 gap-4">
         <div>
           <label for="sugarBefore" class="block text-sm mb-1">Blood Sugar (Before Meal)</label>
@@ -88,7 +96,7 @@
         </div>
       </div>
 
-      <!-- BP management -->
+      <!-- BP -->
       <div id="bp-section" class="hidden col-span-2 grid grid-cols-2 gap-4">
         <div>
           <label for="bpSystolic" class="block text-sm mb-1">Systolic (Upper)</label>
@@ -108,7 +116,7 @@
     </form>
   </section>
 
-  <!-- consultation -->
+  <!-- Consultation -->
   <section class="bg-white p-6 rounded-xl shadow max-w-3xl mx-auto mt-10">
     <h3 class="text-xl font-bold mb-4">Share Your Health Data with Doctor</h3>
     <form class="grid gap-4">
@@ -135,7 +143,7 @@
     </form>
   </section>
 
-  <!-- Charts -->
+  <!-- charts + goal -->
   <script>
     const sleepCtx = document.getElementById('sleepChart').getContext('2d');
     const weightCtx = document.getElementById('weightChart').getContext('2d');
@@ -174,100 +182,79 @@
       options: { responsive: true, maintainAspectRatio: false }
     });
 
-    const goal = localStorage.getItem("healthGoal") || "General Health" ;
+    const goal = localStorage.getItem("healthGoal") || "General Health";
     document.getElementById("goal-display").innerText = goal;
+    document.getElementById("change-goal").value = goal;
 
-    if (goal === "Diabetes Management") {
-      document.getElementById("diabetes-section").classList.remove("hidden");
+    function toggleGoalSections(g) {
+      document.getElementById("diabetes-section").classList.add("hidden");
+      document.getElementById("bp-section").classList.add("hidden");
+      if (g === "Diabetes Management") document.getElementById("diabetes-section").classList.remove("hidden");
+      if (g === "BP Management") document.getElementById("bp-section").classList.remove("hidden");
     }
-    if (goal === "BP Management") {
-      document.getElementById("bp-section").classList.remove("hidden");
-    }
+
+    toggleGoalSections(goal);
+
+    document.getElementById("change-goal").addEventListener("change", function () {
+      const newGoal = this.value;
+      localStorage.setItem("healthGoal", newGoal);
+      document.getElementById("goal-display").innerText = newGoal;
+      toggleGoalSections(newGoal);
+    });
   </script>
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.querySelector("#log form");
-    const recommendationBox = document.querySelector("section.grid-cols-1.md\\:grid-cols-3 > div:nth-child(3) p");
+  <!-- Recommendations -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.querySelector("#log form");
+      const recommendationBox = document.querySelector("section.grid-cols-1.md\\:grid-cols-3 > div:nth-child(3) p");
 
-    if (!form || !recommendationBox) {
-      console.error("Form or Recommendation Box not found in the DOM.");
-      return;
-    }
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const sleep = parseFloat(document.getElementById("sleep").value || "0");
+        const water = parseFloat(document.getElementById("water").value || "0");
+        const meals = document.getElementById("meals").value || "not specified";
+        const exercise = parseFloat(document.getElementById("exercise").value || "0");
+        const sugarBefore = parseFloat(document.getElementById("sugarBefore")?.value || "0");
+        const sugarAfter = parseFloat(document.getElementById("sugarAfter")?.value || "0");
+        const bpSystolic = parseFloat(document.getElementById("bpSystolic")?.value || "0");
+        const bpDiastolic = parseFloat(document.getElementById("bpDiastolic")?.value || "0");
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+        let recommendations = [];
 
-      const sleep = parseFloat(document.getElementById("sleep").value || "0");
-      const water = parseFloat(document.getElementById("water").value || "0");
-      const meals = document.getElementById("meals").value || "not specified";
-      const exercise = parseFloat(document.getElementById("exercise").value || "0");
+        if (sleep < 6) recommendations.push("• Try to get at least 6–8 hours of sleep.");
+        else if (sleep > 9) recommendations.push("• Sleeping more than 9 hours may make you feel sluggish.");
+        else recommendations.push("• Your sleep duration looks good.");
 
-      const sugarBefore = parseFloat(document.getElementById("sugarBefore")?.value || "0");
-      const sugarAfter = parseFloat(document.getElementById("sugarAfter")?.value || "0");
-      const bpSystolic = parseFloat(document.getElementById("bpSystolic")?.value || "0");
-      const bpDiastolic = parseFloat(document.getElementById("bpDiastolic")?.value || "0");
+        if (water < 2) recommendations.push("• Increase your water intake to at least 2L a day.");
+        else if (water > 4.5) recommendations.push("• Too much water can strain kidneys.");
+        else recommendations.push("• Hydration level looks good.");
 
-      let recommendations = [];
+        if (exercise < 20) recommendations.push("• Try to get at least 30 minutes of activity daily.");
+        else if (exercise > 90) recommendations.push("• You might be overexerting.");
+        else recommendations.push("• Good job staying active!");
 
-      // Sleep
-      if (sleep < 6) {
-        recommendations.push("• Try to get at least 6–8 hours of sleep.");
-      } else if (sleep > 9) {
-        recommendations.push("• Sleeping more than 9 hours may make you feel sluggish. Try to limit it.");
-      } else {
-        recommendations.push("• Your sleep duration looks good.");
-      }
-
-      // Water Intake
-      if (water < 2) {
-        recommendations.push("• Increase your water intake to at least 2L a day.");
-      } else if (water > 4.5) {
-        recommendations.push("• Too much water can strain kidneys. Limit to around 4L unless needed.");
-      } else {
-        recommendations.push("• Hydration level looks good.");
-      }
-
-      // Exercise
-      if (exercise < 20) {
-        recommendations.push("• Try to get at least 30 minutes of activity daily.");
-      } else if (exercise > 90) {
-        recommendations.push("• You might be overexerting yourself. Take adequate rest too.");
-      } else {
-        recommendations.push("• Good job staying active!");
-      }
-
-      // Blood Pressure 
-      if (bpSystolic > 0 && bpDiastolic > 0) {
-        if (bpSystolic < 90 || bpSystolic > 120 || bpDiastolic < 60 || bpDiastolic > 80) {
-          recommendations.push("• Your blood pressure is out of normal range. Monitor it closely.");
-        } else {
-          recommendations.push("• Your BP readings are within healthy limits.");
+        if (bpSystolic > 0 && bpDiastolic > 0) {
+          if (bpSystolic < 90 || bpSystolic > 120 || bpDiastolic < 60 || bpDiastolic > 80) {
+            recommendations.push("• BP is out of normal range. Monitor it closely.");
+          } else {
+            recommendations.push("• Your BP readings are within healthy limits.");
+          }
         }
-      }
 
-      // Sugar 
-      if (sugarBefore < 70 || sugarBefore > 130) {
-          recommendations.push("• Fasting sugar is out of range. Watch your intake.");
+        if (goal === "Diabetes Management") {
+          if (sugarBefore < 70 || sugarBefore > 130) recommendations.push("• Fasting sugar is out of range.");
+          if (sugarAfter < 70 || sugarAfter > 180) recommendations.push("• Post-meal sugar should be between 70–180.");
+          if (
+            sugarBefore >= 70 && sugarBefore <= 130 &&
+            sugarAfter >= 70 && sugarAfter <= 180
+          ) recommendations.push("• Your sugar levels look fine. Maintain your routine.");
         }
-        if (sugarAfter < 70 || sugarAfter > 180) {
-          recommendations.push("• Post-meal sugar should be between 70-180.");
-        }
-        if (
-          sugarBefore >= 70 && sugarBefore <= 130 &&
-          sugarAfter >= 70 && sugarAfter <= 180
-        ) {
-          recommendations.push("• Your sugar levels look fine. Maintain your routine.");
-        }
-      
-      // Fallback
-      if (recommendations.length === 0) {
-        recommendations.push("• You're doing great! Maintain your healthy routine.");
-      }
 
-      recommendationBox.innerText =  recommendations.join("\n");
+        if (recommendations.length === 0) recommendations.push("• You're doing great! Maintain your healthy routine.");
+        recommendationBox.innerText = recommendations.join("\n");
+      });
     });
-  });
-</script>
+  </script>
 </body>
 </html>

@@ -31,19 +31,26 @@
       <div class="mb-4">
         <label for="email" class="block text-sm mb-1">Email Address</label>
         <input type="email" id="email" placeholder="you@example.com"
-               class="w-full px-4 py-2 rounded bg-white/70 text-[#003049] focus:outline-none focus:ring-2 focus:ring-[#4dd0e1]" required />
+               class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" required />
       </div>
 
       <div class="mb-4">
         <label for="password" class="block text-sm mb-1">Password</label>
         <input type="password" id="password" placeholder="••••••••"
-               class="w-full px-4 py-2 rounded bg-white/70 text-[#003049] focus:outline-none focus:ring-2 focus:ring-[#4dd0e1]" required />
+               class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" required />
       </div>
 
       <button type="submit"
               class="w-full bg-[#003049] hover:bg-[#002538] text-white font-semibold py-2 rounded transition duration-300">
         Login
       </button>
+
+      <div class="flex justify-center mt-4">
+        <button onclick="signInWithGoogle()" type="button" class="flex items-center justify-center gap-2 px-4 py-2 bg-white text-[#003049] rounded shadow-md hover:shadow-lg transition">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" />
+          Sign in with Google
+        </button>
+      </div>
 
       <p class="text-center text-sm mt-6">
         Don't have an account?
@@ -54,7 +61,6 @@
     <!-- Signup form -->
     <form id="signup-form" class="hidden">
       <div class="grid gap-4">
-
         <div>
           <label for="name" class="text-sm">Full Name</label>
           <input type="text" id="name" required class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
@@ -79,7 +85,7 @@
           </select>
         </div>
 
-        <!-- patients -->
+        <!-- patient-specific fields -->
         <div id="patient-fields">
           <div>
             <label for="goal" class="text-sm">Health Goal</label>
@@ -102,15 +108,15 @@
           <div class="grid grid-cols-3 gap-4">
             <div>
               <label for="age" class="text-sm">Age</label>
-              <input type="number" id="age" min="1" step="1" oninput="validity.valid||(value='')" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+              <input type="number" id="age" min="1" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
             </div>
             <div>
               <label for="height" class="text-sm">Height (cm)</label>
-              <input type="number" id="height" min="1" step="1" oninput="validity.valid||(value='')" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+              <input type="number" id="height" min="1" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
             </div>
             <div>
               <label for="weight" class="text-sm">Weight (kg)</label>
-              <input type="number" id="weight" min="1" step="1" oninput="validity.valid||(value='')" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+              <input type="number" id="weight" min="1" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
             </div>
           </div>
         </div>
@@ -128,22 +134,65 @@
     </form>
   </div>
 
-  <script>
-    function toggleForm() {
-      const loginForm = document.getElementById('login-form');
-      const signupForm = document.getElementById('signup-form');
-      const title = document.getElementById('form-title');
+  <!-- SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-      const isLoginVisible = !loginForm.classList.contains('hidden');
-      loginForm.classList.toggle('hidden', isLoginVisible);
-      signupForm.classList.toggle('hidden', !isLoginVisible);
-      title.innerText = isLoginVisible ? 'Create Your Aarogyam Profile' : 'Welcome to Aarogyam';
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
+      authDomain: "aarogyam-49b0a.firebaseapp.com",
+      projectId: "aarogyam-49b0a",
+      storageBucket: "aarogyam-49b0a.appspot.com",
+      messagingSenderId: "405783290413",
+      appId: "1:405783290413:web:c594704555a50b9b76cea4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function toggleForm() {
+      document.getElementById('login-form').classList.toggle('hidden');
+      document.getElementById('signup-form').classList.toggle('hidden');
+      document.getElementById('form-title').innerText =
+        document.getElementById('login-form').classList.contains('hidden')
+          ? 'Create Your Aarogyam Profile'
+          : 'Welcome to Aarogyam';
     }
 
-    // doctor specific
     document.getElementById('role').addEventListener('change', function () {
       const patientFields = document.getElementById('patient-fields');
       patientFields.classList.toggle('hidden', this.value === 'doctor');
+    });
+
+    document.getElementById('signup-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((cred) => {
+          const uid = cred.user.uid;
+          const role = document.getElementById('role').value;
+          const userData = {
+            name: document.getElementById('name').value,
+            email,
+            role
+          };
+          if (role === 'patient') {
+            userData.goal = document.getElementById('goal').value;
+            userData.conditions = document.getElementById('conditions').value;
+            userData.age = document.getElementById('age').value;
+            userData.height = document.getElementById('height').value;
+            userData.weight = document.getElementById('weight').value;
+            localStorage.setItem("healthGoal", userData.goal);
+          }
+          db.collection("users").doc(uid).set(userData).then(() => {
+            window.location.href = role === 'doctor' ? 'consult.html' : 'dashboard.html';
+          });
+        })
+        .catch((error) => alert(error.message));
     });
 
     document.getElementById('login-form').addEventListener('submit', function (e) {
@@ -151,62 +200,60 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
-      const storedData = JSON.parse(localStorage.getItem('userData'));
-
-      if (storedData && storedData.email === email && storedData.password === password) {
-        const role = storedData.role;
-        if (role === 'doctor') {
-          window.location.href = 'consult.html';
-        } else {
-          window.location.href = 'dashboard.html';
-        }
-      } else {
-        alert('Invalid email or password');
-      }
+      auth.signInWithEmailAndPassword(email, password)
+        .then((cred) => {
+          const uid = cred.user.uid;
+          db.collection("users").doc(uid).get().then(doc => {
+            const data = doc.data();
+            if (data.role === "doctor") {
+              window.location.href = "consult.html";
+            } else {
+              localStorage.setItem("healthGoal", data.goal || "");
+              window.location.href = "dashboard.html";
+            }
+          });
+        })
+        .catch((error) => alert("Login failed: " + error.message));
     });
 
-    document.getElementById('signup-form').addEventListener('submit', function (e) {
-      e.preventDefault();
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          const uid = user.uid;
 
-      const role = document.getElementById('role').value;
-      const healthGoal = document.getElementById('goal')?.value || '';
-
-      const userData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('signup-email').value,
-        password: document.getElementById('signup-password').value,
-        role: role
-      };
-
-      if (role === 'patient') {
-        userData.goal = healthGoal;
-        userData.conditions = document.getElementById('conditions').value;
-        userData.age = document.getElementById('age').value;
-        userData.height = document.getElementById('height').value;
-        userData.weight = document.getElementById('weight').value;
-      }
-
-      localStorage.setItem('userData', JSON.stringify(userData));
-      localStorage.setItem('healthGoal', healthGoal);
-      const selectedRole = document.getElementById('role').value;
-      localStorage.setItem('userType', selectedRole);
-
-      if (role === 'doctor') {
-        window.location.href = 'consult.html';
-      } else {
-        window.location.href = 'dashboard.html';
-      }
-    });
+          db.collection("users").doc(uid).get().then((doc) => {
+            if (doc.exists) {
+              const userData = doc.data();
+              if (userData.role === "doctor") {
+                window.location.href = "consult.html";
+              } else {
+                localStorage.setItem("healthGoal", userData.goal || "");
+                window.location.href = "dashboard.html";
+              }
+            } else {
+              const role = prompt("Are you signing up as 'patient' or 'doctor'?").toLowerCase();
+              if (!["patient", "doctor"].includes(role)) {
+                alert("Invalid role");
+                return;
+              }
+              const userData = {
+                name: user.displayName || "Google User",
+                email: user.email,
+                role
+              };
+              db.collection("users").doc(uid).set(userData).then(() => {
+                window.location.href = role === "doctor" ? "consult.html" : "dashboard.html";
+              });
+            }
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          alert("Google Sign-In failed: " + error.message);
+        });
+    }
   </script>
-  <script>
-  ['age', 'height', 'weight'].forEach(id => {
-    const field = document.getElementById(id);
-    field.addEventListener('keydown', function (e) {
-      if (["e", "E", "+", "-"].includes(e.key)) {
-        e.preventDefault();
-      }
-    });
-  });
-</script>
 </body>
 </html>
