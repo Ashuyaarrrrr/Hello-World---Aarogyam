@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aarogyam | Doctor Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+    }
+  </style>
+</head>
+
+<body class="text-[#003049] min-h-screen px-6 py-8">
+
+  <!-- header -->
+  <header class="flex justify-between items-center mb-8 bg-white px-6 py-4 rounded-xl shadow">
+    <h1 class="text-xl font-bold">Aarogyam</h1>
+    <nav id="navbar" class="space-x-4 text-sm font-medium"></nav>
+  </header>
+
+  <!-- Profile -->
+  <div class="max-w-xl mx-auto bg-white rounded-xl shadow p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Doctor Profile</h2>
+
+    <form id="doctorProfileForm" class="space-y-4">
+      <div>
+        <label class="block text-sm mb-1">Full Name</label>
+        <input type="text" id="name" placeholder="Dr. John Doe" class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" required />
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">Email</label>
+        <input type="email" id="email" readonly class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" />
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">Specialization</label>
+        <input type="text" id="specialization" placeholder="e.g., Cardiologist, Dermatologist" class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm mb-1">Institute</label>
+          <input type="text" id="institute" placeholder="AIIMS Delhi, KGMU, etc." class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" />
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Experience (Years)</label>
+          <input type="number" id="experience" min="0" placeholder="e.g., 5" class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm mb-1">Age</label>
+          <input type="number" id="age" min="21" placeholder="e.g., 32" class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" />
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Doctor Reg. No.</label>
+          <input type="text" id="license" placeholder="e.g., DMC12345" class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">Location (For Offline Consultations)</label>
+        <input type="text" id="location" placeholder="e.g., Gwalior, MP" class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" />
+      </div>
+
+      <button type="submit" class="w-full mt-4 bg-[#003049] hover:bg-[#002538] text-white font-semibold py-2 rounded transition duration-300">
+        Save Profile
+      </button>
+    </form>
+  </div>
+
+  <!-- navbar -->
+  <script>
+    const userType = localStorage.getItem("userType");
+    const navbar = document.getElementById("navbar");
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+
+    if (userType !== "doctor") {
+      window.location.href = "auth.html";
+    } else {
+      navbar.innerHTML = `
+        <a href="index.html" class="hover:text-[#26c6da]">Home</a>
+        <a href="consult.html" class="hover:text-[#26c6da]">Consult</a>
+        <a href="profile.html" class="text-[#26c6da] font-semibold">Profile</a>
+        <a href="contact.html" class="hover:text-[#26c6da]">Contact</a>
+        <a href="auth.html" class="hover:text-[#26c6da]" onclick="logout()">Logout</a>
+      `;
+    }
+
+    const profileForm = document.getElementById("doctorProfileForm");
+    const userData = JSON.parse(localStorage.getItem("userData")) || {};
+
+    //prefill
+    document.getElementById("name").value = userData.name || "";
+    document.getElementById("email").value = userData.email || "";
+    document.getElementById("specialization").value = userData.specialization || "";
+    document.getElementById("institute").value = userData.institute || "";
+    document.getElementById("experience").value = userData.experience || "";
+    document.getElementById("age").value = userData.age || "";
+    document.getElementById("license").value = userData.license || "";
+    document.getElementById("location").value = userData.location || "";
+
+    //submit
+    profileForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const updatedDoctorData = {
+        ...userData,
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        specialization: document.getElementById("specialization").value,
+        institute: document.getElementById("institute").value,
+        experience: document.getElementById("experience").value,
+        age: document.getElementById("age").value,
+        license: document.getElementById("license").value,
+        location: document.getElementById("location").value,
+      };
+
+      localStorage.setItem("userData", JSON.stringify(updatedDoctorData));
+      alert("Profile saved successfully!");
+    });
+  </script>
+</body>
+</html>

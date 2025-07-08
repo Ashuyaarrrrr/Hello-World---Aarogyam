@@ -15,6 +15,11 @@
 - Condition-specific input fields (e.g., for diabetes or BP)
 - New **Reports** section showing past doctor consultations
 - Option to **download summaries** of reports
+- Login/Signup page
+- Doctor’s consultation page for patient-doctor interaction
+- Doctor’s profile section
+- Optimized dashboard for more accurate medical suggestions
+- Added a contact page
 
 ---
 

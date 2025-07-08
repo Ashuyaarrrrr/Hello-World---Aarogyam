@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aarogyam | Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom right, #4dd0e1, #81d4fa);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen">
+  <div class="glass-card rounded-xl p-8 w-full max-w-lg text-white shadow-lg">
+    <h2 id="form-title" class="text-3xl font-bold text-center mb-6">Welcome to Aarogyam</h2>
+
+    <!-- Login form -->
+    <form id="login-form">
+      <div class="mb-4">
+        <label for="email" class="block text-sm mb-1">Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com"
+               class="w-full px-4 py-2 rounded bg-white/70 text-[#003049] focus:outline-none focus:ring-2 focus:ring-[#4dd0e1]" required />
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="block text-sm mb-1">Password</label>
+        <input type="password" id="password" placeholder="••••••••"
+               class="w-full px-4 py-2 rounded bg-white/70 text-[#003049] focus:outline-none focus:ring-2 focus:ring-[#4dd0e1]" required />
+      </div>
+
+      <button type="submit"
+              class="w-full bg-[#003049] hover:bg-[#002538] text-white font-semibold py-2 rounded transition duration-300">
+        Login
+      </button>
+
+      <p class="text-center text-sm mt-6">
+        Don't have an account?
+        <button type="button" onclick="toggleForm()" class="text-[#003049] font-semibold hover:underline">Sign Up</button>
+      </p>
+    </form>
+
+    <!-- Signup form -->
+    <form id="signup-form" class="hidden">
+      <div class="grid gap-4">
+
+        <div>
+          <label for="name" class="text-sm">Full Name</label>
+          <input type="text" id="name" required class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+        </div>
+
+        <div>
+          <label for="signup-email" class="text-sm">Email</label>
+          <input type="email" id="signup-email" required class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+        </div>
+
+        <div>
+          <label for="signup-password" class="text-sm">Password</label>
+          <input type="password" id="signup-password" required class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+        </div>
+
+        <div>
+          <label for="role" class="text-sm">Register As</label>
+          <select id="role" required class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]">
+            <option value="">Select role</option>
+            <option value="patient">Patient</option>
+            <option value="doctor">Doctor</option>
+          </select>
+        </div>
+
+        <!-- patients -->
+        <div id="patient-fields">
+          <div>
+            <label for="goal" class="text-sm">Health Goal</label>
+            <select id="goal" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]">
+              <option value="">Select goal</option>
+              <option>General Health</option>
+              <option>Weight Loss</option>
+              <option>Diabetes Management</option>
+              <option>Muscle Gain</option>
+              <option>BP Management</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="conditions" class="text-sm">Previous Medical Conditions</label>
+            <input type="text" id="conditions" placeholder="e.g., asthma, diabetes"
+                   class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label for="age" class="text-sm">Age</label>
+              <input type="number" id="age" min="1" step="1" oninput="validity.valid||(value='')" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+            </div>
+            <div>
+              <label for="height" class="text-sm">Height (cm)</label>
+              <input type="number" id="height" min="1" step="1" oninput="validity.valid||(value='')" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+            </div>
+            <div>
+              <label for="weight" class="text-sm">Weight (kg)</label>
+              <input type="number" id="weight" min="1" step="1" oninput="validity.valid||(value='')" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+            </div>
+          </div>
+        </div>
+
+        <button type="submit"
+                class="w-full mt-4 bg-[#003049] hover:bg-[#002538] text-white font-semibold py-2 rounded transition duration-300">
+          Create Account
+        </button>
+
+        <p class="text-center text-sm mt-4">
+          Already have an account?
+          <button type="button" onclick="toggleForm()" class="text-[#003049] font-semibold hover:underline">Login</button>
+        </p>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function toggleForm() {
+      const loginForm = document.getElementById('login-form');
+      const signupForm = document.getElementById('signup-form');
+      const title = document.getElementById('form-title');
+
+      const isLoginVisible = !loginForm.classList.contains('hidden');
+      loginForm.classList.toggle('hidden', isLoginVisible);
+      signupForm.classList.toggle('hidden', !isLoginVisible);
+      title.innerText = isLoginVisible ? 'Create Your Aarogyam Profile' : 'Welcome to Aarogyam';
+    }
+
+    // doctor specific
+    document.getElementById('role').addEventListener('change', function () {
+      const patientFields = document.getElementById('patient-fields');
+      patientFields.classList.toggle('hidden', this.value === 'doctor');
+    });
+
+    document.getElementById('login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const storedData = JSON.parse(localStorage.getItem('userData'));
+
+      if (storedData && storedData.email === email && storedData.password === password) {
+        const role = storedData.role;
+        if (role === 'doctor') {
+          window.location.href = 'consult.html';
+        } else {
+          window.location.href = 'dashboard.html';
+        }
+      } else {
+        alert('Invalid email or password');
+      }
+    });
+
+    document.getElementById('signup-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const role = document.getElementById('role').value;
+      const healthGoal = document.getElementById('goal')?.value || '';
+
+      const userData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('signup-email').value,
+        password: document.getElementById('signup-password').value,
+        role: role
+      };
+
+      if (role === 'patient') {
+        userData.goal = healthGoal;
+        userData.conditions = document.getElementById('conditions').value;
+        userData.age = document.getElementById('age').value;
+        userData.height = document.getElementById('height').value;
+        userData.weight = document.getElementById('weight').value;
+      }
+
+      localStorage.setItem('userData', JSON.stringify(userData));
+      localStorage.setItem('healthGoal', healthGoal);
+      const selectedRole = document.getElementById('role').value;
+      localStorage.setItem('userType', selectedRole);
+
+      if (role === 'doctor') {
+        window.location.href = 'consult.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    });
+  </script>
+  <script>
+  ['age', 'height', 'weight'].forEach(id => {
+    const field = document.getElementById(id);
+    field.addEventListener('keydown', function (e) {
+      if (["e", "E", "+", "-"].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+  });
+</script>
+</body>
+</html>
