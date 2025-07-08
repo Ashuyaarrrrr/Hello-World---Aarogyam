@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aarogyam</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .typing {
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 3px solid white;
+      animation: typing 2.5s steps(10), blink 0.8s step-end infinite;
+      width: 0;
+      font-size: 3rem;
+      color: white;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 10ch }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+
+    #intro {
+      position: fixed;
+      inset: 0;
+      background-color: #000;
+      z-index: 50;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="intro">
+    <h1 id="typed-title" class="typing">Aarogyam</h1>
+  </div>
+
+</body>
+</html>
