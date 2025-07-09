@@ -85,7 +85,7 @@
           </select>
         </div>
 
-        <!-- patient-specific fields -->
+        <!-- patient-specific -->
         <div id="patient-fields">
           <div>
             <label for="goal" class="text-sm">Health Goal</label>
@@ -139,7 +139,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-  <!-- Final Script -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
@@ -189,7 +188,7 @@
             userData.weight = document.getElementById('weight').value;
             localStorage.setItem("healthGoal", userData.goal);
           }
-          localStorage.setItem("userType", role); // ✅ Save role
+          localStorage.setItem("userType", role); 
           db.collection("users").doc(uid).set(userData).then(() => {
             window.location.href = role === 'doctor' ? 'consult.html' : 'dashboard.html';
           });

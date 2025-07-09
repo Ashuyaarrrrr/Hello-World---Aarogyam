@@ -65,7 +65,7 @@
       <p class="text-sm mb-4">Feel free to reach us directly or drop your message through the form.</p>
       <ul class="space-y-3 text-sm">
         <li>📍 <strong>Address:</strong> Aarogyam HQ, New Delhi, India</li>
-        <li>📞 <strong>Phone:</strong> +91 98765 43210</li>
+        <li>📞 <strong>Phone:</strong> +91 88711 82278</li>
         <li>✉️ <strong>Email:</strong> support@Aarogyamhealth.in</li>
         <li>🕐 <strong>Hours:</strong> Mon - Fri, 9AM - 6PM</li>
       </ul>
@@ -80,6 +80,59 @@
       <p class="text-sm">Our team will reach out to you shortly.</p>
     </div>
   </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
+      authDomain: "aarogyam-49b0a.firebaseapp.com",
+      projectId: "aarogyam-49b0a",
+      storageBucket: "aarogyam-49b0a.appspot.com",
+      messagingSenderId: "405783290413",
+      appId: "1:405783290413:web:c594704555a50b9b76cea4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const contactForm = document.getElementById("contactForm");
+      const modal = document.getElementById("successModal");
+
+      contactForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById("name")?.value.trim();
+        const email = document.getElementById("email")?.value.trim();
+        const message = document.getElementById("message")?.value.trim();
+
+        if (!name || !email || !message) {
+          alert("Please fill all fields.");
+          return;
+        }
+
+        try {
+          await addDoc(collection(db, "contact_messages"), {
+            name,
+            email,
+            message,
+            timestamp: serverTimestamp()
+          });
+
+          modal.classList.remove("hidden");
+          contactForm.reset();
+          setTimeout(() => modal.classList.add("hidden"), 3000);
+
+        } catch (error) {
+          console.error("Error submitting message:", error);
+          alert("Something went wrong. Please try again.");
+        }
+      });
+    });
+  </script>
 
   <script>
     const userType = localStorage.getItem("userType");
@@ -121,19 +174,6 @@
 
       navbar.innerHTML = links;
     }
-    //animation control
-    const contactForm = document.getElementById("contactForm");
-    const modal = document.getElementById("successModal");
-
-    contactForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      modal.classList.remove("hidden");
-      contactForm.reset();
-
-      setTimeout(() => {
-        modal.classList.add("hidden");
-      }, 3000);
-    });
   </script>
 </body>
 </html>

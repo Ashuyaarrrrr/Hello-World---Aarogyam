@@ -38,7 +38,7 @@
     <p class="text-sm text-[#004d40]">View and manage consultation requests from patients</p>
   </div>
 
-  <!-- Dummy Consultation Cards -->
+  <!-- Dummy Consultation requests -->
   <div class="max-w-4xl mx-auto grid gap-6 animate-fade-in">
 
     <div class="bg-white rounded-xl shadow p-6">
@@ -78,6 +78,71 @@
     </div>
 
   </div>
+  <!-- Firebase Scripts -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collectionGroup, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
+    authDomain: "aarogyam-49b0a.firebaseapp.com",
+    projectId: "aarogyam-49b0a",
+    storageBucket: "aarogyam-49b0a.appspot.com",
+    messagingSenderId: "405783290413",
+    appId: "1:405783290413:web:c594704555a50b9b76cea4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  const container = document.querySelector(".grid");
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const doctorEmail = user.email;
+
+      const q = query(
+        collectionGroup(db, "consultation_details"),
+        where("doctorEmail", "==", doctorEmail)
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      container.innerHTML = ""; // clear dummy cards
+
+      if (querySnapshot.empty) {
+        container.innerHTML = `<p class="text-center text-gray-600">No consultation requests yet.</p>`;
+      } else {
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const sharedData = data.sharedData || {};
+          const patient = data.patientEmail || "Unknown Patient";
+          const time = data.timestamp?.toDate().toLocaleString() || "Unknown Time";
+
+          const listItems = Object.entries(sharedData)
+            .map(([key, val]) => `<li><strong>${key}:</strong> ${val}</li>`)
+            .join("");
+
+          const card = `
+            <div class="bg-white rounded-xl shadow p-6 animate-fade-in">
+              <h3 class="text-lg font-bold mb-1">Patient: ${patient}</h3>
+              <p class="text-sm text-[#004d40]">🧬 Shared Data:</p>
+              <ul class="list-disc list-inside text-sm mt-2">${listItems}</ul>
+              <p class="text-xs text-gray-500 mt-2">📅 ${time}</p>
+              <button class="mt-3 bg-[#003049] hover:bg-[#002538] text-white px-4 py-2 rounded text-sm">Accept Request</button>
+            </div>
+          `;
+
+          container.insertAdjacentHTML("beforeend", card);
+        });
+      }
+    } else {
+      container.innerHTML = `<p class="text-center text-red-600">Please log in to view consultation requests.</p>`;
+    }
+  });
+</script>
 
 </body>
 </html>

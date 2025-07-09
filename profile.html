@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aarogyam | Doctor Profile</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <style>
     body {
       background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
@@ -73,20 +76,35 @@
     </form>
   </div>
 
-  <!-- navbar + form logic -->
+  <!-- Firebase SDKs -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const navbar = document.getElementById("navbar");
-      const userType = localStorage.getItem("userType");
-      const userData = JSON.parse(localStorage.getItem("userData")) || {};
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
+      authDomain: "aarogyam-49b0a.firebaseapp.com",
+      projectId: "aarogyam-49b0a",
+      storageBucket: "aarogyam-49b0a.appspot.com",
+      messagingSenderId: "405783290413",
+      appId: "1:405783290413:web:c594704555a50b9b76cea4"
+    };
 
-      // Redirect non-doctors
-      if (userType !== "doctor") {
-        window.location.href = "profile.html";
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    const navbar = document.getElementById("navbar");
+    const form = document.getElementById("doctorProfileForm");
+
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        alert("Login required");
+        window.location.href = "auth.html";
         return;
       }
 
-      // Set navbar for doctor
+      const uid = user.uid;
+      const email = user.email;
+
+      // navbar
       navbar.innerHTML = `
         <a href="index.html" class="hover:text-[#26c6da]">Home</a>
         <a href="consult.html" class="hover:text-[#26c6da]">Consult</a>
@@ -95,25 +113,28 @@
         <a href="#" class="hover:text-[#26c6da]" onclick="logout()">Logout</a>
       `;
 
-      // Prefill profile form
-      document.getElementById("name").value = userData.name || "";
-      document.getElementById("email").value = userData.email || "";
-      document.getElementById("specialization").value = userData.specialization || "";
-      document.getElementById("institute").value = userData.institute || "";
-      document.getElementById("experience").value = userData.experience || "";
-      document.getElementById("age").value = userData.age || "";
-      document.getElementById("license").value = userData.license || "";
-      document.getElementById("location").value = userData.location || "";
+      document.getElementById("email").value = email;
 
-      // Save form
-      const profileForm = document.getElementById("doctorProfileForm");
-      profileForm.addEventListener("submit", function (e) {
+      // Fetch existing data
+      db.collection("doctorprofile").doc(uid).get().then((docSnap) => {
+        if (docSnap.exists) {
+          const data = docSnap.data();
+          document.getElementById("name").value = data.name || "";
+          document.getElementById("specialization").value = data.specialization || "";
+          document.getElementById("institute").value = data.institute || "";
+          document.getElementById("experience").value = data.experience || "";
+          document.getElementById("age").value = data.age || "";
+          document.getElementById("license").value = data.license || "";
+          document.getElementById("location").value = data.location || "";
+        }
+      });
+
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const updatedDoctorData = {
-          ...userData,
+        const updatedData = {
           name: document.getElementById("name").value,
-          email: document.getElementById("email").value,
+          email: email,
           specialization: document.getElementById("specialization").value,
           institute: document.getElementById("institute").value,
           experience: document.getElementById("experience").value,
@@ -122,14 +143,22 @@
           location: document.getElementById("location").value,
         };
 
-        localStorage.setItem("userData", JSON.stringify(updatedDoctorData));
-        alert("Profile saved successfully!");
+        try {
+          await db.collection("doctorprofile").doc(uid).set(updatedData);
+          localStorage.setItem("userData", JSON.stringify(updatedData));
+          alert("Profile saved successfully!");
+        } catch (err) {
+          console.error("Error saving profile:", err);
+          alert("Failed to save profile.");
+        }
       });
     });
 
     function logout() {
       localStorage.clear();
-      window.location.href = "index.html";
+      firebase.auth().signOut().then(() => {
+        window.location.href = "index.html";
+      });
     }
   </script>
 </body>

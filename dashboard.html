@@ -197,9 +197,9 @@
         try {
           await addDoc(collection(db, "users", user.uid, "consultation_details"), {
             doctorEmail,
-            patientEmail: user.email, // ✅ Important for record
+            patientEmail: user.email, 
             sharedData,
-            timestamp: serverTimestamp() // ✅ Firestore-compatible timestamp
+            timestamp: serverTimestamp() 
           });
           alert("Health data successfully shared!");
           consultForm.reset();
@@ -215,7 +215,7 @@
 </script>
 
 
- <!-- chart scripts -->
+ <!-- charts logic -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const form = document.querySelector("#log form");
@@ -277,7 +277,7 @@
       sleepData[todayIndex] = sleep;
       waterData[todayIndex] = water;
 
-      // Update chart
+      // Updating
       sleepChart.data.datasets[0].data = reorderDataForDisplay(sleepData);
       waterChart.data.datasets[0].data = reorderDataForDisplay(waterData);
       sleepChart.update();

@@ -1,6 +1,9 @@
 # Hello World! - Aarogyam
 
-## Progress made so far
+**Aarogyam** is a smart health monitoring platform that helps users track their daily wellness metrics (sleep, meals, water intake, exercise, BP/sugar levels) and securely share health logs with doctors.
+Doctors can view consultation requests, analyze patient data, and manage profiles seamlessly — all from one dashboard. Built using HTML, Tailwind CSS, Firebase, and JavaScript.
+
+## Features added during hackathon
 - Splash screen with animated typing effect
 - 3D DNA animation background using Spline
 - Fixed header with Login/Sign Up button
@@ -24,10 +27,13 @@
 - Integrated backend with signup/login page
 - Real time updates with chart for progress report
 - Option to change goal after registration
+- Integrated backend with doctor profile page
+- Integrated backend with contact page
+- Tested all features
 
 ---
 
-## Tools Used
+## Tech Stack
 
 - HTML, CSS, JavaScript
 - Tailwind CSS
