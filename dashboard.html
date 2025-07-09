@@ -116,45 +116,115 @@
     </form>
   </section>
 
-  <!-- Consultation -->
-  <section class="bg-white p-6 rounded-xl shadow max-w-3xl mx-auto mt-10">
-    <h3 class="text-xl font-bold mb-4">Share Your Health Data with Doctor</h3>
-    <form id="consultForm" class="grid gap-4">
-      <div>
-        <label for="doctorEmail" class="text-sm block mb-1">Doctor's Email</label>
-        <input type="email" id="doctorEmail" placeholder="doctor@example.com"
-               class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" required />
-      </div>
+<!-- Consultation Form -->
+<section class="bg-white p-6 rounded-xl shadow max-w-3xl mx-auto mt-8">
+  <h3 class="text-xl font-bold mb-4">Share with Doctor</h3>
+  <form id="consultForm" class="space-y-4">
+    <div>
+      <label for="doctorEmail" class="block text-sm mb-1">Doctor's Email</label>
+      <input type="email" id="doctorEmail" class="w-full px-4 py-2 rounded bg-[#f0f9fa]" required />
+    </div>
+    <fieldset class="space-y-2">
+      <legend class="text-sm font-medium mb-1">Select data to share:</legend>
+      <div><label><input type="checkbox" value="Sleep Data" class="shareOption mr-2" /> Sleep</label></div>
+      <div><label><input type="checkbox" value="Water Intake" class="shareOption mr-2" /> Water Intake</label></div>
+      <div><label><input type="checkbox" value="Activity Logs" class="shareOption mr-2" /> Exercise</label></div>
+      <div><label><input type="checkbox" value="Meals" class="shareOption mr-2" /> Meals</label></div>
+      <div><label><input type="checkbox" value="BP / Sugar Levels" class="shareOption mr-2" /> BP / Sugar Levels</label></div>
+    </fieldset>
+    <button type="submit" class="w-full bg-[#003049] text-white py-2 rounded hover:bg-[#002538]">
+      Share with Doctor
+    </button>
+  </form>
+</section>
 
-      <div>
-        <label class="text-sm block mb-2">Select Data to Share</label>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <label><input type="checkbox" class="shareOption mr-2" value="Sleep Data" /> Sleep Data</label>
-          <label><input type="checkbox" class="shareOption mr-2" value="Water Intake" /> Water Intake</label>
-          <label><input type="checkbox" class="shareOption mr-2" value="Activity Logs" /> Activity Logs</label>
-          <label><input type="checkbox" class="shareOption mr-2" value="Meals" /> Meals</label>
-          <label><input type="checkbox" class="shareOption mr-2" value="BP / Sugar Levels" /> BP / Sugar Levels</label>
+<!-- consultation backend -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        </div>
-      </div>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
+    authDomain: "aarogyam-49b0a.firebaseapp.com",
+    projectId: "aarogyam-49b0a",
+    storageBucket: "aarogyam-49b0a.firebasestorage.app",
+    messagingSenderId: "405783290413",
+    appId: "1:405783290413:web:c594704555a50b9b76cea4"
+  };
 
-      <button type="submit" class="w-full mt-4 bg-[#003049] text-white py-2 rounded hover:bg-[#002538]">
-        Share with Doctor
-      </button>
-    </form>
-  </section>
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
 
- <!-- Chart Scripts -->
-  <script>
+  const consultForm = document.getElementById("consultForm");
+
+  consultForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const doctorEmail = document.getElementById("doctorEmail").value.trim();
+    const selectedOptions = Array.from(document.querySelectorAll(".shareOption:checked")).map(cb => cb.value);
+
+    if (!doctorEmail || selectedOptions.length === 0) {
+      alert("Please enter doctor's email and select at least one data type.");
+      return;
+    }
+
+    // Collect data
+    const sleep = document.getElementById("sleep")?.value || "Not entered";
+    const water = document.getElementById("water")?.value || "Not entered";
+    const exercise = document.getElementById("exercise")?.value || "Not entered";
+    const meals = document.getElementById("meals")?.value || "Not entered";
+    const bpSystolic = document.getElementById("bpSystolic")?.value || "Not entered";
+    const bpDiastolic = document.getElementById("bpDiastolic")?.value || "Not entered";
+    const sugarBefore = document.getElementById("sugarBefore")?.value || "Not entered";
+    const sugarAfter = document.getElementById("sugarAfter")?.value || "Not entered";
+
+    const allData = {
+      "Sleep Data": `${sleep} hours`,
+      "Water Intake": `${water} L`,
+      "Activity Logs": `${exercise} mins`,
+      "Meals": meals,
+      "BP / Sugar Levels": `BP: ${bpSystolic}/${bpDiastolic}, Sugar: ${sugarBefore}/${sugarAfter}`
+    };
+
+    const sharedData = {};
+    selectedOptions.forEach(option => {
+      sharedData[option] = allData[option];
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          await addDoc(collection(db, "users", user.uid, "consultation_details"), {
+            doctorEmail,
+            sharedData,
+            timestamp: new Date()
+          });
+          alert("Health data successfully shared!");
+          consultForm.reset();
+        } catch (err) {
+          console.error("Error saving consultation data:", err);
+          alert("Error sharing data.");
+        }
+      } else {
+        alert("You must be logged in to share data.");
+      }
+    });
+  });
+</script>
+
+ <!-- chart scripts -->
+<script>
   document.addEventListener("DOMContentLoaded", () => {
     const form = document.querySelector("#log form");
 
     const sleepChartRef = document.getElementById("sleepChart").getContext("2d");
     const waterChartRef = document.getElementById("waterintake").getContext("2d");
 
-    // Load from localStorage
-    let sleepData = JSON.parse(localStorage.getItem("sleepData")) || [6.5, 7, 5.5, 8, 7.5, 6, 7];
-    let waterData = JSON.parse(localStorage.getItem("waterData")) || [2.5, 3, 2.2, 3.1, 2.8, 2.6, 3];
+    const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let sleepData = JSON.parse(localStorage.getItem("sleepData")) || [0, 0, 0, 0, 0, 0, 0];
+    let waterData = JSON.parse(localStorage.getItem("waterData")) || [0, 0, 0, 0, 0, 0, 0];
 
     let sleepChart = new Chart(sleepChartRef, {
       type: "line",
@@ -162,7 +232,7 @@
         labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         datasets: [{
           label: "Hours of Sleep",
-          data: sleepData,
+          data: reorderDataForDisplay(sleepData),
           backgroundColor: "rgba(77, 208, 225, 0.2)",
           borderColor: "#4dd0e1",
           borderWidth: 2,
@@ -179,7 +249,7 @@
         labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         datasets: [{
           label: "Water Intake (L)",
-          data: waterData,
+          data: reorderDataForDisplay(waterData),
           backgroundColor: "rgba(129, 212, 250, 0.2)",
           borderColor: "#81d4fa",
           borderWidth: 2,
@@ -201,34 +271,61 @@
       const sleep = parseFloat(document.getElementById("sleep").value || "0");
       const water = parseFloat(document.getElementById("water")?.value || "0");
 
-      // Update chart data for 7 entries
-      sleepData.push(sleep);
-      waterData.push(water);
-      if (sleepData.length > 7) sleepData.shift();
-      if (waterData.length > 7) waterData.shift();
+      const todayIndex = new Date().getDay(); 
 
-      sleepChart.data.datasets[0].data = sleepData;
-      waterChart.data.datasets[0].data = waterData;
+      sleepData[todayIndex] = sleep;
+      waterData[todayIndex] = water;
+
+      // Update chart
+      sleepChart.data.datasets[0].data = reorderDataForDisplay(sleepData);
+      waterChart.data.datasets[0].data = reorderDataForDisplay(waterData);
       sleepChart.update();
       waterChart.update();
 
-      // Save data to localStorage
       localStorage.setItem("sleepData", JSON.stringify(sleepData));
       localStorage.setItem("waterData", JSON.stringify(waterData));
     });
+
+    function reorderDataForDisplay(data) {
+      return [data[1], data[2], data[3], data[4], data[5], data[6], data[0]];
+    }
   });
 
+  const goal = localStorage.getItem("healthGoal") || "General Health";
+  document.getElementById("goal-display").innerText = goal;
 
+  if (goal === "Diabetes Management") {
+    document.getElementById("diabetes-section").classList.remove("hidden");
+  }
+  if (goal === "BP Management") {
+    document.getElementById("bp-section").classList.remove("hidden");
+  }
+  toggleGoalSections(goal);
 
-    const goal = localStorage.getItem("healthGoal") || "General Health" ;
-    document.getElementById("goal-display").innerText = goal;
+  document.getElementById("change-goal").addEventListener("change", function () {
+    const newGoal = this.value;
+    localStorage.setItem("healthGoal", newGoal);
+    document.getElementById("goal-display").innerText = newGoal;
+    toggleGoalSections(newGoal);
+  });
+</script>
 
-    if (goal === "Diabetes Management") {
-      document.getElementById("diabetes-section").classList.remove("hidden");
+  <script>
+    function toggleGoalSections(g) {
+      document.getElementById("diabetes-section").classList.add("hidden");
+      document.getElementById("bp-section").classList.add("hidden");
+      if (g === "Diabetes Management") document.getElementById("diabetes-section").classList.remove("hidden");
+      if (g === "BP Management") document.getElementById("bp-section").classList.remove("hidden");
     }
-    if (goal === "BP Management") {
-      document.getElementById("bp-section").classList.remove("hidden");
-    }
+
+    toggleGoalSections(goal);
+
+    document.getElementById("change-goal").addEventListener("change", function () {
+      const newGoal = this.value;
+      localStorage.setItem("healthGoal", newGoal);
+      document.getElementById("goal-display").innerText = newGoal;
+      toggleGoalSections(newGoal);
+    });
   </script>
 
   <!-- Recommendations -->
@@ -284,64 +381,5 @@
       });
     });
   </script>
-
-    <!-- Firebase SDKs -->
-  <script type="module">
-    // Import Firebase modules
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    // Your Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
-      authDomain: "aarogyam-49b0a.firebaseapp.com",
-      projectId: "aarogyam-49b0a",
-      storageBucket: "aarogyam-49b0a.firebasestorage.app",
-      messagingSenderId: "405783290413",
-      appId: "1:405783290413:web:c594704555a50b9b76cea4"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    // Handle Consultation Form Submission
-    const consultForm = document.getElementById("consultForm");
-
-    consultForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const doctorEmail = document.getElementById("doctorEmail").value.trim();
-      const selectedOptions = Array.from(document.querySelectorAll(".shareOption:checked"))
-                                  .map((checkbox) => checkbox.value);
-
-      if (!doctorEmail || selectedOptions.length === 0) {
-        alert("Please enter doctor's email and select at least one data type to share.");
-        return;
-      }
-
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          try {
-            await addDoc(collection(db, "users", user.uid, "consultation_details"), {
-              doctorEmail: doctorEmail,
-              sharedData: selectedOptions,
-              timestamp: new Date()
-            });
-            alert("Health data successfully shared with the doctor!");
-            consultForm.reset();
-          } catch (error) {
-            console.error("Error saving consultation:", error);
-            alert("Failed to share data. Try again.");
-          }
-        } else {
-          alert("Please log in to share your data.");
-        }
-      });
-    });
-  </script>
-
 </body>
 </html>

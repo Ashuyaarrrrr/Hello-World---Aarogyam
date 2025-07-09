@@ -79,14 +79,14 @@
   </div>
 
   <script>
-    // Load data from localStorage (if available)
     const user = JSON.parse(localStorage.getItem("newGoogleUser"));
-    if (!user) {
-      alert("No user found. Redirecting to login.");
+    if (!user || !user.email) {
+      alert("User not found. Please log in again.");
       window.location.href = "auth.html";
     }
 
-    document.getElementById("fullName").value = user.name || "";
+    // Prefill full name
+    document.getElementById("fullName").value = user.name || user.displayName || "";
 
     const roleSelect = document.getElementById("role");
     const patientFields = document.getElementById("patientFields");
@@ -98,8 +98,13 @@
     document.getElementById("profileForm").addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const role = document.getElementById("role").value;
+      const role = roleSelect.value;
       const name = document.getElementById("fullName").value;
+
+      if (!role || !name) {
+        alert("Please complete all required fields.");
+        return;
+      }
 
       const userData = {
         uid: user.uid,
@@ -108,11 +113,12 @@
         role,
       };
 
+      localStorage.setItem("userType", role); // ✅ Critical line
       if (role === "patient") {
-        userData.age = parseInt(document.getElementById("age").value);
-        userData.weight = parseFloat(document.getElementById("weight").value);
-        userData.height = parseFloat(document.getElementById("height").value);
-        userData.goal = document.getElementById("goal").value;
+        userData.age = parseInt(document.getElementById("age").value) || 0;
+        userData.weight = parseFloat(document.getElementById("weight").value) || 0;
+        userData.height = parseFloat(document.getElementById("height").value) || 0;
+        userData.goal = document.getElementById("goal").value || "General Health";
         localStorage.setItem("healthGoal", userData.goal);
       }
 
@@ -126,5 +132,6 @@
       }
     });
   </script>
+
 </body>
 </html>

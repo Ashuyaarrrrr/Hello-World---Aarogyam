@@ -134,11 +134,12 @@
     </form>
   </div>
 
-  <!-- SDKs -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
+  <!-- Final Script -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
@@ -188,6 +189,7 @@
             userData.weight = document.getElementById('weight').value;
             localStorage.setItem("healthGoal", userData.goal);
           }
+          localStorage.setItem("userType", role); // ✅ Save role
           db.collection("users").doc(uid).set(userData).then(() => {
             window.location.href = role === 'doctor' ? 'consult.html' : 'dashboard.html';
           });
@@ -205,6 +207,7 @@
           const uid = cred.user.uid;
           db.collection("users").doc(uid).get().then(doc => {
             const data = doc.data();
+            localStorage.setItem("userType", data.role); // ✅ Save role
             if (data.role === "doctor") {
               window.location.href = "consult.html";
             } else {
@@ -216,41 +219,39 @@
         .catch((error) => alert("Login failed: " + error.message));
     });
 
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          const uid = user.uid;
 
-  function signInWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider)
-      .then((result) => {
-        const user = result.user;
-        const uid = user.uid;
-
-        db.collection("users").doc(uid).get().then((doc) => {
-          if (doc.exists) {
-            const userData = doc.data();
-            if (userData.role === "doctor") {
-              window.location.href = "consult.html";
+          db.collection("users").doc(uid).get().then((doc) => {
+            if (doc.exists) {
+              const userData = doc.data();
+              localStorage.setItem("userType", userData.role); 
+              if (userData.role === "doctor") {
+                window.location.href = "consult.html";
+              } else {
+                localStorage.setItem("healthGoal", userData.goal || "");
+                window.location.href = "dashboard.html";
+              }
             } else {
-              localStorage.setItem("healthGoal", userData.goal || "");
-              window.location.href = "dashboard.html";
+              localStorage.setItem("newGoogleUser", JSON.stringify({
+                uid: user.uid,
+                email: user.email,
+                name: user.displayName || ""
+              }));
+              window.location.href = "details.html";
             }
-          } else {
-            // naya user → redirect to full-page details.html
-            localStorage.setItem("newGoogleUser", JSON.stringify({
-              uid: user.uid,
-              email: user.email,
-              name: user.displayName || ""
-            }));
-            window.location.href = "details.html";
-          }
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          alert("Google Sign-In failed: " + error.message);
         });
-      })
-      .catch((error) => {
-        console.error(error);
-        alert("Google Sign-In failed: " + error.message);
-      });
-  }
-</script>
-
+    }
   </script>
+  
 </body>
 </html>
