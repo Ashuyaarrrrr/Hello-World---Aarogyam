@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aarogyam | Complete Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom right, #4dd0e1, #81d4fa);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen">
+  <div class="glass-card rounded-xl p-8 w-full max-w-2xl text-white shadow-lg">
+    <h2 class="text-3xl font-bold text-center mb-6">Complete Your Aarogyam Profile</h2>
+
+    <form id="profileForm" class="grid grid-cols-1 gap-6">
+      <div>
+        <label for="fullName" class="block mb-1 text-sm">Full Name</label>
+        <input type="text" id="fullName" placeholder="Your full name"
+               class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" required />
+      </div>
+
+      <div>
+        <label for="role" class="block mb-1 text-sm">Register As</label>
+        <select id="role" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" required>
+          <option value="" disabled selected>Select Role</option>
+          <option value="patient">Patient</option>
+          <option value="doctor">Doctor</option>
+        </select>
+      </div>
+
+      <!-- Patient-specific fields -->
+      <div id="patientFields" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+        <div>
+          <label for="age" class="block mb-1 text-sm">Age</label>
+          <input type="number" id="age" placeholder="e.g. 25"
+                 class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+        </div>
+        <div>
+          <label for="weight" class="block mb-1 text-sm">Weight (kg)</label>
+          <input type="number" id="weight" placeholder="e.g. 65"
+                 class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+        </div>
+        <div>
+          <label for="height" class="block mb-1 text-sm">Height (cm)</label>
+          <input type="number" id="height" placeholder="e.g. 170"
+                 class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]" />
+        </div>
+        <div>
+          <label for="goal" class="block mb-1 text-sm">Health Goal</label>
+          <select id="goal" class="w-full px-4 py-2 rounded bg-white/70 text-[#003049]">
+            <option value="">Select Goal</option>
+            <option>General Health</option>
+            <option>Weight Loss</option>
+            <option>Diabetes Management</option>
+            <option>Muscle Gain</option>
+            <option>BP Management</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit"
+              class="w-full mt-4 bg-[#003049] hover:bg-[#002538] text-white font-semibold py-2 rounded transition duration-300">
+        Save & Continue
+      </button>
+    </form>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
+      authDomain: "aarogyam-49b0a.firebaseapp.com",
+      projectId: "aarogyam-49b0a"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const user = JSON.parse(localStorage.getItem("newGoogleUser"));
+    if (!user) {
+      alert("No user found. Redirecting to login.");
+      window.location.href = "auth.html";
+    }
+
+    document.getElementById("fullName").value = user.name || "";
+
+    const roleSelect = document.getElementById("role");
+    const patientFields = document.getElementById("patientFields");
+
+    roleSelect.addEventListener("change", () => {
+      patientFields.classList.toggle("hidden", roleSelect.value !== "patient");
+    });
+
+    document.getElementById("profileForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const fullName = document.getElementById("fullName").value;
+      const role = document.getElementById("role").value;
+
+      const userData = {
+        name: fullName,
+        email: user.email,
+        role,
+      };
+
+      if (role === "patient") {
+        userData.age = parseInt(document.getElementById("age").value);
+        userData.weight = parseFloat(document.getElementById("weight").value);
+        userData.height = parseFloat(document.getElementById("height").value);
+        userData.goal = document.getElementById("goal").value;
+        localStorage.setItem("healthGoal", userData.goal);
+      }
+
+      await db.collection("users").doc(user.uid).set(userData);
+      localStorage.removeItem("newGoogleUser");
+
+      if (role === "doctor") {
+        window.location.href = "consult.html";
+      } else {
+        window.location.href = "dashboard.html";
+      }
+    });
+  </script>
+</body>
+</html>

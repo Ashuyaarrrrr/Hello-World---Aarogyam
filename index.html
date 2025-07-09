@@ -1,85 +1,181 @@
-<!-- Paste this script at the bottom of your HTML, just before </body> -->
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.querySelector("#log form");
-    const recommendationBox = document.querySelector("section.grid-cols-1.md\\:grid-cols-3 > div:nth-child(3) p");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aarogyam</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.22/build/spline-viewer.js"></script>
 
-    if (!form || !recommendationBox) {
-      console.error("Form or Recommendation Box not found in the DOM.");
-      return;
+  <style>
+    html {
+      scroll-behavior: smooth;
     }
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+    }
 
-      const sleep = parseFloat(document.getElementById("sleep").value || "0");
-      const water = parseFloat(document.getElementById("water").value || "0");
-      const meals = document.getElementById("meals").value || "not specified";
-      const exercise = parseFloat(document.getElementById("exercise").value || "0");
+    /* Typing */
+    .typing {
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 3px solid white;
+      animation: typing 2.5s steps(10), blink 0.8s step-end infinite;
+      width: 0;
+      font-size: 3rem;
+      color: white;
+    }
 
-      const sugarBefore = parseFloat(document.getElementById("sugarBefore")?.value || "0");
-      const sugarAfter = parseFloat(document.getElementById("sugarAfter")?.value || "0");
-      const bpSystolic = parseFloat(document.getElementById("bpSystolic")?.value || "0");
-      const bpDiastolic = parseFloat(document.getElementById("bpDiastolic")?.value || "0");
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 10ch }
+    }
 
-      let recommendations = [];
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
 
-      // Sleep
-      if (sleep < 6) {
-        recommendations.push("• Try to get at least 6–8 hours of sleep.");
-      } else if (sleep > 9) {
-        recommendations.push("• Sleeping more than 9 hours may make you feel sluggish. Try to limit it.");
-      } else {
-        recommendations.push("• Your sleep duration looks good.");
-      }
+    /* Intro bg*/
+    #intro {
+      position: fixed;
+      inset: 0;
+      background-color: #000;
+      z-index: 50;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
 
-      // Water Intake
-      if (water < 2) {
-        recommendations.push("• Increase your water intake to at least 2L a day.");
-      } else if (water > 4.5) {
-        recommendations.push("• Too much water can strain kidneys. Limit to around 4L unless needed.");
-      } else {
-        recommendations.push("• Hydration level looks good.");
-      }
+    /* Background 3D model */
+    #spline-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
 
-      // Exercise
-      if (exercise < 20) {
-        recommendations.push("• Try to get at least 30 minutes of activity daily.");
-      } else if (exercise > 90) {
-        recommendations.push("• You might be overexerting yourself. Take adequate rest too.");
-      } else {
-        recommendations.push("• Good job staying active!");
-      }
+    #spline-bg.visible {
+      opacity: 1;
+    }
 
-      // Blood Pressure (always show if data entered)
-      if (bpSystolic > 0 && bpDiastolic > 0) {
-        if (bpSystolic < 90 || bpSystolic > 120 || bpDiastolic < 60 || bpDiastolic > 80) {
-          recommendations.push("• Your blood pressure is out of normal range. Monitor it closely.");
-        } else {
-          recommendations.push("• Your BP readings are within healthy limits.");
-        }
-      }
+    /* Main content */
+    #main-content {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
 
-      // Sugar (only if goal is Diabetes Management)
-      if (sugarBefore < 70 || sugarBefore > 130) {
-          recommendations.push("• Fasting sugar is out of range. Watch your intake.");
-        }
-        if (sugarAfter < 70 || sugarAfter > 180) {
-          recommendations.push("• Post-meal sugar should be between 70-180.");
-        }
-        if (
-          sugarBefore >= 70 && sugarBefore <= 130 &&
-          sugarAfter >= 70 && sugarAfter <= 180
-        ) {
-          recommendations.push("• Your sugar levels look fine. Maintain your routine.");
-        }
-      
-      // Fallback
-      if (recommendations.length === 0) {
-        recommendations.push("• You're doing great! Maintain your healthy routine.");
-      }
+    #main-content.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
 
-      recommendationBox.innerText =  recommendations.join("\n");
-    });
-  });
+<body class="bg-white text-[#003049]">
+
+  <!-- 3D DNA Background -->
+  <spline-viewer id="spline-bg" url="https://prod.spline.design/ztNbSaAb3Tyngftd/scene.splinecode"></spline-viewer>
+
+  <!-- Intro Animation -->
+  <div id="intro">
+    <h1 id="typed-title" class="typing">Aarogyam</h1>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main-content">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 w-full px-6 py-4 flex justify-between items-center z-20 bg-[#003049] text-white shadow-md">
+      <h1 class="text-2xl font-bold">Aarogyam</h1>
+      <a href="auth.html" class="bg-white text-[#003049] px-4 py-2 rounded hover:bg-[#e0e0e0] transition duration-300">
+        Login / Sign Up
+      </a>
+    </header>
+
+    <!-- Hero section -->
+    <section class="min-h-screen flex items-center justify-center text-center px-4">
+      <div class="max-w-2xl mt-20">
+        <h2 class="text-4xl font-bold mb-4">Your Health, Our Responsibility</h2>
+        <p class="text-lg mb-6 text-[#003049]">
+          Track your sleep, diet, exercise, and more with Aarogyam — your personalized health companion.
+        </p>
+        <a href="#features" class="bg-black text-white px-6 py-3 rounded-lg text-lg hover:bg-[#dfefff] transition duration-300">
+          Explore Features
+        </a>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20 bg-white text-[#003049] px-6">
+      <div class="max-w-5xl mx-auto text-center">
+        <h3 class="text-3xl font-bold mb-12">Features</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="bg-[#e0f7fa] p-6 rounded-lg shadow">
+            <h4 class="text-xl font-semibold mb-2">Daily Health Logging</h4>
+            <p class="text-sm">Track your sleep, meals, water, and exercise in one place.</p>
+          </div>
+          <div class="bg-[#e0f2f1] p-6 rounded-lg shadow">
+            <h4 class="text-xl font-semibold mb-2">Personalized Reports</h4>
+            <p class="text-sm">Weekly/monthly analysis with smart recommendations.</p>
+          </div>
+          <div class="bg-[#e3f2fd] p-6 rounded-lg shadow">
+            <h4 class="text-xl font-semibold mb-2">AI-Based Insights</h4>
+            <p class="text-sm">Get intelligent suggestions to improve your health.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA section -->
+    <section class="py-20 bg-gradient-to-r from-[#4dd0e1] to-[#81d4fa] text-[#003049] px-6">
+      <div class="text-center max-w-2xl mx-auto">
+        <h3 class="text-3xl font-bold mb-4">Start Your Health Journey Today</h3>
+        <p class="text-lg mb-6">Join Aarogyam and take the first step toward a healthier life.</p>
+        <a href="auth.html" class="bg-[#003049] text-white px-6 py-3 rounded-lg text-lg hover:bg-[#002538] transition duration-300">
+          Login / Sign Up
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#003049] text-center py-6 text-sm text-white">
+      © 2025 Aarogyam. All rights reserved.
+    </footer>
+  </div>
+
+  <!-- animation -->
+  <script>
+    setTimeout(() => {
+      document.getElementById('intro').style.display = 'none';
+
+      document.getElementById('spline-bg').classList.add('visible');
+
+      document.getElementById('main-content').classList.add('visible');
+    }, 3000); 
+  </script>
+  <script>
+  const introShown = localStorage.getItem('introShown');
+
+  // preloader repeat nahi hona chahiye
+  if (introShown) {
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('spline-bg').classList.add('visible');
+    document.getElementById('main-content').classList.add('visible');
+  } else {
+    setTimeout(() => {
+      document.getElementById('intro').style.display = 'none';
+      document.getElementById('spline-bg').classList.add('visible');
+      document.getElementById('main-content').classList.add('visible');
+      localStorage.setItem('introShown', 'true');
+    }, 3000);
+  }
 </script>
+
+</body>
+</html>
