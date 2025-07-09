@@ -78,21 +78,8 @@
     </form>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
-      authDomain: "aarogyam-49b0a.firebaseapp.com",
-      projectId: "aarogyam-49b0a"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
+    // Load data from localStorage (if available)
     const user = JSON.parse(localStorage.getItem("newGoogleUser"));
     if (!user) {
       alert("No user found. Redirecting to login.");
@@ -108,14 +95,15 @@
       patientFields.classList.toggle("hidden", roleSelect.value !== "patient");
     });
 
-    document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    document.getElementById("profileForm").addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const fullName = document.getElementById("fullName").value;
       const role = document.getElementById("role").value;
+      const name = document.getElementById("fullName").value;
 
       const userData = {
-        name: fullName,
+        uid: user.uid,
+        name,
         email: user.email,
         role,
       };
@@ -128,7 +116,7 @@
         localStorage.setItem("healthGoal", userData.goal);
       }
 
-      await db.collection("users").doc(user.uid).set(userData);
+      localStorage.setItem("userData", JSON.stringify(userData));
       localStorage.removeItem("newGoogleUser");
 
       if (role === "doctor") {

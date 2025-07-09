@@ -216,44 +216,41 @@
         .catch((error) => alert("Login failed: " + error.message));
     });
 
-    function signInWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then((result) => {
-          const user = result.user;
-          const uid = user.uid;
 
-          db.collection("users").doc(uid).get().then((doc) => {
-            if (doc.exists) {
-              const userData = doc.data();
-              if (userData.role === "doctor") {
-                window.location.href = "consult.html";
-              } else {
-                localStorage.setItem("healthGoal", userData.goal || "");
-                window.location.href = "dashboard.html";
-              }
+  function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+      .then((result) => {
+        const user = result.user;
+        const uid = user.uid;
+
+        db.collection("users").doc(uid).get().then((doc) => {
+          if (doc.exists) {
+            const userData = doc.data();
+            if (userData.role === "doctor") {
+              window.location.href = "consult.html";
             } else {
-              const role = prompt("Are you signing up as 'patient' or 'doctor'?").toLowerCase();
-              if (!["patient", "doctor"].includes(role)) {
-                alert("Invalid role");
-                return;
-              }
-              const userData = {
-                name: user.displayName || "Google User",
-                email: user.email,
-                role
-              };
-              db.collection("users").doc(uid).set(userData).then(() => {
-                window.location.href = role === "doctor" ? "consult.html" : "dashboard.html";
-              });
+              localStorage.setItem("healthGoal", userData.goal || "");
+              window.location.href = "dashboard.html";
             }
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-          alert("Google Sign-In failed: " + error.message);
+          } else {
+            // naya user → redirect to full-page details.html
+            localStorage.setItem("newGoogleUser", JSON.stringify({
+              uid: user.uid,
+              email: user.email,
+              name: user.displayName || ""
+            }));
+            window.location.href = "details.html";
+          }
         });
-    }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("Google Sign-In failed: " + error.message);
+      });
+  }
+</script>
+
   </script>
 </body>
 </html>

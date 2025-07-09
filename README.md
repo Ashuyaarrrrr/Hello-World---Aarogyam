@@ -20,6 +20,10 @@
 - Doctor’s profile section
 - Optimized dashboard for more accurate medical suggestions
 - Added a contact page
+- Added Details Page after google sign in
+- Integrated backend with signup/login page
+- Real time updates with chart for progress report
+- Option to change goal after registration
 
 ---
 
@@ -29,4 +33,6 @@
 - Tailwind CSS
 - Spline 3D Viewer
 - Chart.js (for graphs)
+- Firebase Authentication
+- Firestore Database
 

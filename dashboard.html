@@ -58,8 +58,8 @@
       <canvas id="sleepChart" width="100%" height="300"></canvas>
     </div>
     <div class="bg-white p-4 rounded-xl shadow" style="height: 300px;">
-      <h3 class="font-semibold mb-2">Weight Progress</h3>
-      <canvas id="weightChart" width="100%" height="300"></canvas>
+      <h3 class="font-semibold mb-2">Water Intake</h3>
+      <canvas id="waterintake" width="100%" height="300"></canvas>
     </div>
   </section>
 
@@ -143,49 +143,103 @@
     </form>
   </section>
 
-  <!-- charts + goal -->
+ <!-- chart scripts -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("#log form");
+
+    const sleepChartRef = document.getElementById("sleepChart").getContext("2d");
+    const waterChartRef = document.getElementById("waterintake").getContext("2d");
+
+    const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let sleepData = JSON.parse(localStorage.getItem("sleepData")) || [0, 0, 0, 0, 0, 0, 0];
+    let waterData = JSON.parse(localStorage.getItem("waterData")) || [0, 0, 0, 0, 0, 0, 0];
+
+    let sleepChart = new Chart(sleepChartRef, {
+      type: "line",
+      data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        datasets: [{
+          label: "Hours of Sleep",
+          data: reorderDataForDisplay(sleepData),
+          backgroundColor: "rgba(77, 208, 225, 0.2)",
+          borderColor: "#4dd0e1",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    let waterChart = new Chart(waterChartRef, {
+      type: "line",
+      data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        datasets: [{
+          label: "Water Intake (L)",
+          data: reorderDataForDisplay(waterData),
+          backgroundColor: "rgba(129, 212, 250, 0.2)",
+          borderColor: "#81d4fa",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    if (!form) {
+      console.error("Form not found in the DOM.");
+      return;
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const sleep = parseFloat(document.getElementById("sleep").value || "0");
+      const water = parseFloat(document.getElementById("water")?.value || "0");
+
+      const todayIndex = new Date().getDay(); 
+
+      sleepData[todayIndex] = sleep;
+      waterData[todayIndex] = water;
+
+      // Update chart
+      sleepChart.data.datasets[0].data = reorderDataForDisplay(sleepData);
+      waterChart.data.datasets[0].data = reorderDataForDisplay(waterData);
+      sleepChart.update();
+      waterChart.update();
+
+      localStorage.setItem("sleepData", JSON.stringify(sleepData));
+      localStorage.setItem("waterData", JSON.stringify(waterData));
+    });
+
+    function reorderDataForDisplay(data) {
+      return [data[1], data[2], data[3], data[4], data[5], data[6], data[0]];
+    }
+  });
+
+  const goal = localStorage.getItem("healthGoal") || "General Health";
+  document.getElementById("goal-display").innerText = goal;
+
+  if (goal === "Diabetes Management") {
+    document.getElementById("diabetes-section").classList.remove("hidden");
+  }
+  if (goal === "BP Management") {
+    document.getElementById("bp-section").classList.remove("hidden");
+  }
+  toggleGoalSections(goal);
+
+  document.getElementById("change-goal").addEventListener("change", function () {
+    const newGoal = this.value;
+    localStorage.setItem("healthGoal", newGoal);
+    document.getElementById("goal-display").innerText = newGoal;
+    toggleGoalSections(newGoal);
+  });
+</script>
+
   <script>
-    const sleepCtx = document.getElementById('sleepChart').getContext('2d');
-    const weightCtx = document.getElementById('weightChart').getContext('2d');
-
-    new Chart(sleepCtx, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Hours of Sleep',
-          data: [6.5, 7, 5.5, 8, 7.5, 6, 7],
-          backgroundColor: 'rgba(77, 208, 225, 0.2)',
-          borderColor: '#4dd0e1',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-
-    new Chart(weightCtx, {
-      type: 'line',
-      data: {
-        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-        datasets: [{
-          label: 'Weight (kg)',
-          data: [72, 71.5, 70.8, 70],
-          backgroundColor: 'rgba(129, 212, 250, 0.2)',
-          borderColor: '#81d4fa',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-
-    const goal = localStorage.getItem("healthGoal") || "General Health";
-    document.getElementById("goal-display").innerText = goal;
-    document.getElementById("change-goal").value = goal;
-
     function toggleGoalSections(g) {
       document.getElementById("diabetes-section").classList.add("hidden");
       document.getElementById("bp-section").classList.add("hidden");

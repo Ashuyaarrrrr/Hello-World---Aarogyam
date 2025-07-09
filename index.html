@@ -7,7 +7,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.22/build/spline-viewer.js"></script>
 
-  <style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
     html {
       scroll-behavior: smooth;
     }
@@ -26,7 +30,9 @@
       animation: typing 2.5s steps(10), blink 0.8s step-end infinite;
       width: 0;
       font-size: 3rem;
+      font-family: poppins;
       color: white;
+      font-weight: 600;
     }
 
     @keyframes typing {
@@ -85,7 +91,7 @@
 
   <!-- Intro Animation -->
   <div id="intro">
-    <h1 id="typed-title" class="typing">Aarogyam</h1>
+    <h1 id="typed-title" class="typing">AAROGYAM</h1>
   </div>
 
   <!-- Main Content -->
@@ -159,23 +165,5 @@
       document.getElementById('main-content').classList.add('visible');
     }, 3000); 
   </script>
-  <script>
-  const introShown = localStorage.getItem('introShown');
-
-  // preloader repeat nahi hona chahiye
-  if (introShown) {
-    document.getElementById('intro').style.display = 'none';
-    document.getElementById('spline-bg').classList.add('visible');
-    document.getElementById('main-content').classList.add('visible');
-  } else {
-    setTimeout(() => {
-      document.getElementById('intro').style.display = 'none';
-      document.getElementById('spline-bg').classList.add('visible');
-      document.getElementById('main-content').classList.add('visible');
-      localStorage.setItem('introShown', 'true');
-    }, 3000);
-  }
-</script>
-
 </body>
 </html>
