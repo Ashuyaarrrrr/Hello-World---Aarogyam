@@ -207,7 +207,7 @@
           const uid = cred.user.uid;
           db.collection("users").doc(uid).get().then(doc => {
             const data = doc.data();
-            localStorage.setItem("userType", data.role); // ✅ Save role
+            localStorage.setItem("userType", data.role); 
             if (data.role === "doctor") {
               window.location.href = "consult.html";
             } else {
@@ -219,38 +219,45 @@
         .catch((error) => alert("Login failed: " + error.message));
     });
 
-    function signInWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then((result) => {
-          const user = result.user;
-          const uid = user.uid;
+   function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      const user = result.user;
+      const uid = user.uid;
 
-          db.collection("users").doc(uid).get().then((doc) => {
-            if (doc.exists) {
-              const userData = doc.data();
-              localStorage.setItem("userType", userData.role); 
-              if (userData.role === "doctor") {
-                window.location.href = "consult.html";
-              } else {
-                localStorage.setItem("healthGoal", userData.goal || "");
-                window.location.href = "dashboard.html";
-              }
-            } else {
-              localStorage.setItem("newGoogleUser", JSON.stringify({
-                uid: user.uid,
-                email: user.email,
-                name: user.displayName || ""
-              }));
-              window.location.href = "details.html";
-            }
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-          alert("Google Sign-In failed: " + error.message);
-        });
-    }
+      db.collection("users").doc(uid).get().then((doc) => {
+        if (doc.exists) {
+          const userData = doc.data();
+          localStorage.setItem("userType", userData.role);
+          if (userData.role === "doctor") {
+            window.location.href = "consult.html";
+          } else {
+            localStorage.setItem("healthGoal", userData.goal || "");
+            window.location.href = "dashboard.html";
+          }
+        } else {
+          const newGoogleUser = {
+            uid: user.uid,
+            email: user.email,
+            name: user.displayName || ""
+          };
+          localStorage.setItem("newGoogleUser", JSON.stringify(newGoogleUser));
+          
+          localStorage.removeItem("userData");
+          localStorage.removeItem("userType");
+          localStorage.removeItem("healthGoal");
+
+          window.location.href = "details.html";
+        }
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      alert("Google Sign-In failed: " + error.message);
+    });
+}
+
   </script>
   
 </body>

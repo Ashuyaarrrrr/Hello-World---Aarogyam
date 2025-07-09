@@ -141,14 +141,14 @@
 <!-- consultation backend -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDvl4VPsWUAh1YJE_rpgXoKJ7YkAeU-HdM",
     authDomain: "aarogyam-49b0a.firebaseapp.com",
     projectId: "aarogyam-49b0a",
-    storageBucket: "aarogyam-49b0a.firebasestorage.app",
+    storageBucket: "aarogyam-49b0a.appspot.com",
     messagingSenderId: "405783290413",
     appId: "1:405783290413:web:c594704555a50b9b76cea4"
   };
@@ -170,7 +170,6 @@
       return;
     }
 
-    // Collect data
     const sleep = document.getElementById("sleep")?.value || "Not entered";
     const water = document.getElementById("water")?.value || "Not entered";
     const exercise = document.getElementById("exercise")?.value || "Not entered";
@@ -198,8 +197,9 @@
         try {
           await addDoc(collection(db, "users", user.uid, "consultation_details"), {
             doctorEmail,
+            patientEmail: user.email, // ✅ Important for record
             sharedData,
-            timestamp: new Date()
+            timestamp: serverTimestamp() // ✅ Firestore-compatible timestamp
           });
           alert("Health data successfully shared!");
           consultForm.reset();
@@ -213,6 +213,7 @@
     });
   });
 </script>
+
 
  <!-- chart scripts -->
 <script>

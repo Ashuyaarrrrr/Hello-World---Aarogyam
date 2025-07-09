@@ -9,18 +9,15 @@
     body {
       background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
     }
-
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(20px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-
     .animate-fade-in {
       animation: fadeIn 0.5s ease-out;
     }
   </style>
 </head>
-
 <body class="text-[#003049] min-h-screen px-6 py-8">
 
   <!-- Navbar -->
@@ -31,50 +28,56 @@
       <a href="consult.html" class="text-[#26c6da] font-semibold">Consult</a>
       <a href="profile.html" class="hover:text-[#26c6da]">Profile</a>
       <a href="contact.html" class="hover:text-[#26c6da]">Contact</a>
-      <a href="auth.html" class="hover:text-[#26c6da]" onclick="logout()">Logout</a>
+      <a href="auth.html" class="hover:text-[#26c6da]">Logout</a>
     </nav>
   </header>
 
-  <!-- title -->
+  <!-- Title -->
   <div class="text-center mb-10">
     <h2 class="text-3xl font-bold mb-2">Pending Consultations</h2>
     <p class="text-sm text-[#004d40]">View and manage consultation requests from patients</p>
   </div>
 
-  <!-- dummy -->
+  <!-- Dummy Consultation Cards -->
   <div class="max-w-4xl mx-auto grid gap-6 animate-fade-in">
+
     <div class="bg-white rounded-xl shadow p-6">
-      <h3 class="text-lg font-bold mb-1">Riya Sharma</h3>
-      <p class="text-sm">🧬 Condition: Diabetes</p>
-      <p class="text-sm">🎯 Goal: Blood Sugar Control</p>
-      <p class="text-sm">🎂 Age: 29</p>
+      <h3 class="text-lg font-bold mb-1">Patient: Aakash Mehta</h3>
+      <p class="text-sm text-[#004d40]">🧬 Shared Data:</p>
+      <ul class="list-disc list-inside text-sm mt-2">
+        <li><strong>Sleep Data:</strong> 7 hours</li>
+        <li><strong>Water Intake:</strong> 2.5 L</li>
+        <li><strong>Meals:</strong> 3 meals</li>
+      </ul>
+      <p class="text-xs text-gray-500 mt-2">📅 9 July 2025, 2:30 PM</p>
       <button class="mt-3 bg-[#003049] hover:bg-[#002538] text-white px-4 py-2 rounded text-sm">Accept Request</button>
     </div>
 
     <div class="bg-white rounded-xl shadow p-6">
-      <h3 class="text-lg font-bold mb-1">Ankit Verma</h3>
-      <p class="text-sm">🧬 Condition: Hypertension</p>
-      <p class="text-sm">🎯 Goal: BP Management</p>
-      <p class="text-sm">🎂 Age: 42</p>
+      <h3 class="text-lg font-bold mb-1">Patient: Riya Sharma</h3>
+      <p class="text-sm text-[#004d40]">🧬 Shared Data:</p>
+      <ul class="list-disc list-inside text-sm mt-2">
+        <li><strong>Activity Logs:</strong> 30 mins walk</li>
+        <li><strong>BP / Sugar Levels:</strong> BP: 120/80, Sugar: 95/130</li>
+      </ul>
+      <p class="text-xs text-gray-500 mt-2">📅 9 July 2025, 12:45 PM</p>
       <button class="mt-3 bg-[#003049] hover:bg-[#002538] text-white px-4 py-2 rounded text-sm">Accept Request</button>
     </div>
 
     <div class="bg-white rounded-xl shadow p-6">
-      <h3 class="text-lg font-bold mb-1">Meera Joshi</h3>
-      <p class="text-sm">🧬 Condition: Obesity</p>
-      <p class="text-sm">🎯 Goal: Weight Loss</p>
-      <p class="text-sm">🎂 Age: 35</p>
+      <h3 class="text-lg font-bold mb-1">Patient: Kabir Singh</h3>
+      <p class="text-sm text-[#004d40]">🧬 Shared Data:</p>
+      <ul class="list-disc list-inside text-sm mt-2">
+        <li><strong>Sleep Data:</strong> 6 hours</li>
+        <li><strong>Water Intake:</strong> 1.8 L</li>
+        <li><strong>Meals:</strong> 2 meals</li>
+        <li><strong>Activity Logs:</strong> 20 mins</li>
+      </ul>
+      <p class="text-xs text-gray-500 mt-2">📅 8 July 2025, 10:15 PM</p>
       <button class="mt-3 bg-[#003049] hover:bg-[#002538] text-white px-4 py-2 rounded text-sm">Accept Request</button>
     </div>
+
   </div>
-
-  <script>
-    function logout() {
-      localStorage.removeItem('userData');
-      localStorage.removeItem('healthGoal');
-      window.location.href = 'index.html';
-    }
-  </script>
 
 </body>
 </html>

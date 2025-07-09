@@ -113,7 +113,7 @@
         role,
       };
 
-      localStorage.setItem("userType", role); // ✅ Critical line
+      localStorage.setItem("userType", role); 
       if (role === "patient") {
         userData.age = parseInt(document.getElementById("age").value) || 0;
         userData.weight = parseFloat(document.getElementById("weight").value) || 0;
