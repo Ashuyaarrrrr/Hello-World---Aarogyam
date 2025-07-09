@@ -27,7 +27,7 @@
     <form id="doctorProfileForm" class="space-y-4">
       <div>
         <label class="block text-sm mb-1">Full Name</label>
-        <input type="text" id="name" placeholder="Dr. John Doe" class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" required />
+        <input type="text" id="name" placeholder="Dr.Ashu" class="w-full px-4 py-2 rounded bg-[#f0f9fa] text-[#003049]" required />
       </div>
 
       <div>
@@ -73,60 +73,64 @@
     </form>
   </div>
 
-  <!-- navbar -->
+  <!-- navbar + form logic -->
   <script>
-    const userType = localStorage.getItem("userType");
-    const navbar = document.getElementById("navbar");
+    document.addEventListener("DOMContentLoaded", () => {
+      const navbar = document.getElementById("navbar");
+      const userType = localStorage.getItem("userType");
+      const userData = JSON.parse(localStorage.getItem("userData")) || {};
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = "index.html";
-    }
+      // Redirect non-doctors
+      if (userType !== "doctor") {
+        window.location.href = "profile.html";
+        return;
+      }
 
-    if (userType !== "doctor") {
-      window.location.href = "profile.html";
-    } else {
+      // Set navbar for doctor
       navbar.innerHTML = `
         <a href="index.html" class="hover:text-[#26c6da]">Home</a>
         <a href="consult.html" class="hover:text-[#26c6da]">Consult</a>
         <a href="profile.html" class="text-[#26c6da] font-semibold">Profile</a>
         <a href="contact.html" class="hover:text-[#26c6da]">Contact</a>
-        <a href="auth.html" class="hover:text-[#26c6da]" onclick="logout()">Logout</a>
+        <a href="#" class="hover:text-[#26c6da]" onclick="logout()">Logout</a>
       `;
-    }
 
-    const profileForm = document.getElementById("doctorProfileForm");
-    const userData = JSON.parse(localStorage.getItem("userData")) || {};
+      // Prefill profile form
+      document.getElementById("name").value = userData.name || "";
+      document.getElementById("email").value = userData.email || "";
+      document.getElementById("specialization").value = userData.specialization || "";
+      document.getElementById("institute").value = userData.institute || "";
+      document.getElementById("experience").value = userData.experience || "";
+      document.getElementById("age").value = userData.age || "";
+      document.getElementById("license").value = userData.license || "";
+      document.getElementById("location").value = userData.location || "";
 
-    //prefill
-    document.getElementById("name").value = userData.name || "";
-    document.getElementById("email").value = userData.email || "";
-    document.getElementById("specialization").value = userData.specialization || "";
-    document.getElementById("institute").value = userData.institute || "";
-    document.getElementById("experience").value = userData.experience || "";
-    document.getElementById("age").value = userData.age || "";
-    document.getElementById("license").value = userData.license || "";
-    document.getElementById("location").value = userData.location || "";
+      // Save form
+      const profileForm = document.getElementById("doctorProfileForm");
+      profileForm.addEventListener("submit", function (e) {
+        e.preventDefault();
 
-    //submit
-    profileForm.addEventListener("submit", function (e) {
-      e.preventDefault();
+        const updatedDoctorData = {
+          ...userData,
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          specialization: document.getElementById("specialization").value,
+          institute: document.getElementById("institute").value,
+          experience: document.getElementById("experience").value,
+          age: document.getElementById("age").value,
+          license: document.getElementById("license").value,
+          location: document.getElementById("location").value,
+        };
 
-      const updatedDoctorData = {
-        ...userData,
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        specialization: document.getElementById("specialization").value,
-        institute: document.getElementById("institute").value,
-        experience: document.getElementById("experience").value,
-        age: document.getElementById("age").value,
-        license: document.getElementById("license").value,
-        location: document.getElementById("location").value,
-      };
-
-      localStorage.setItem("userData", JSON.stringify(updatedDoctorData));
-      alert("Profile saved successfully!");
+        localStorage.setItem("userData", JSON.stringify(updatedDoctorData));
+        alert("Profile saved successfully!");
+      });
     });
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
   </script>
 </body>
 </html>
